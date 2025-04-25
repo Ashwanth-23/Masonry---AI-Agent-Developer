@@ -55,7 +55,14 @@ class ContentAnalyzer:
             Dictionary of extracted information
         """
         if self.use_mock:
-            return self._mock_extract_information(content, query)
+            extracted_info = self._mock_extract_information(content, query)
+            # Ensure the return value is a plain dictionary with accessible attributes
+            return {
+                "key_points": extracted_info["key_points"],  # List of strings
+                "relevant_terms": extracted_info["relevant_terms"],  # List of strings
+                "mentions": extracted_info["mentions"],  # Dict of lists
+                "topic_relevance": extracted_info["topic_relevance"]  # Float
+            }
         
         # Implement real AI-based information extraction here
         pass
@@ -72,7 +79,13 @@ class ContentAnalyzer:
             Dictionary with reliability score and factors
         """
         if self.use_mock:
-            return self._mock_reliability_assessment(content, source_url)
+            reliability_info = self._mock_reliability_assessment(content, source_url)
+            # Ensure the return value is a plain dictionary with accessible attributes
+            return {
+                "reliability_score": reliability_info["reliability_score"],  # Float
+                "factors": reliability_info["factors"],  # List of strings
+                "domain_reputation": reliability_info["domain_reputation"]  # String
+            }
         
         # Implement real AI-based reliability assessment here
         pass

@@ -101,6 +101,11 @@
                         {% endfor %}
                     </ul>
                     <p><strong>Relevant Terms:</strong> {{ key_info.relevant_terms|join(', ') }}</p>
+                    <ul class="list-disc pl-5">
+                        <li>Score: {{ reliability.reliability_score }}</li>
+                        <li>Domain Reputation: {{ reliability.domain_reputation }}</li>
+                        <li>Factors: {{ reliability.factors|join(', ') }}</li>
+                    </ul>
                 </div>
             </div>
             <div class="collapsible mt-4">
