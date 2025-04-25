@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Research Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6 max-w-4xl">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">Web Research Agent</h1>
+        <form method="post" class="mb-6">
+            <div class="flex items-center">
+                <input type="text" name="query" value="{{ query }}" placeholder="Enter your query (e.g., 'tell about the ai agent')" class="flex-1 p-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="bg-blue-600 text-white p-3 rounded-r-lg hover:bg-blue-700 transition duration-300">Search</button>
+            </div>
+        </form>
+        {% if results %}
+        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Search Results</h2>
+        <div class="grid gap-4">
+            {% for result in results %}
+            <a href="/scrape?url={{ result.url }}&query={{ query }}" class="result-card block p-4 bg-white rounded-lg border border-gray-200 no-underline">
+                <h3 class="text-xl font-medium text-blue-600">{{ loop.index }}. {{ result.title }}</h3>
+                <p class="text-gray-600 mt-2"><strong>URL:</strong> <span class="text-blue-500 underline">{{ result.url }}</span></p>
+                <p class="text-gray-600 mt-1"><strong>Snippet:</strong> {{ result.snippet }}</p>
+                <p class="text-gray-500 mt-1"><strong>Date:</strong> {{ result.date if result.date else 'Not available' }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center">Enter a query to see search results.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

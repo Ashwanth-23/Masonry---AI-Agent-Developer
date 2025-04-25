@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Research Agent - Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .collapsible { transition: max-height 0.3s ease-out; }
+        .collapsible-content { max-height: 0; overflow: hidden; }
+        .collapsible.open .collapsible-content { max-height: 1000px; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const collapsibles = document.querySelectorAll('.collapsible');
+            collapsibles.forEach(collapsible => {
+                collapsible.querySelector('.collapsible-header').addEventListener('click', () => {
+                    collapsible.classList.toggle('open');
+                });
+            });
+        });
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-6 max-w-4xl">
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">Web Research Agent - Result</h1>
+        <a href="/" class="text-blue-600 hover:underline mb-4 inline-block">← Back to Search</a>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Scraped Content: {{ content.title }}</h2>
+            <p class="text-gray-600"><strong>URL:</strong> <a href="{{ content.url }}" target="_blank" class="text-blue-500 underline">{{ content.url }}</a></p>
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Main Content (Excerpt)</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    <p>{{ content.main_content[:500] + '...' if content.main_content|length > 500 else content.main_content }}</p>
+                </div>
+            </div>
+            {% if content.tables %}
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Tables</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    {% for table in content.tables %}
+                    <p class="font-medium">Table {{ loop.index }}:</p>
+                    <p>Headers: {{ table.headers }}</p>
+                    <p>Rows: {{ table.rows }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if content.lists %}
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Lists</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    {% for list_item in content.lists %}
+                    <p class="font-medium">List {{ loop.index }} ({{ list_item.type }}):</p>
+                    <ul class="list-disc pl-5">
+                        {% for item in list_item.items[:3] %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                        {% if list_item.items|length > 3 %}
+                        <li>...</li>
+                        {% endif %}
+                    </ul>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if content.links %}
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Links</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    <ul class="list-disc pl-5">
+                        {% for link in content.links[:3] %}
+                        <li><a href="{{ link.url }}" target="_blank" class="text-blue-500 underline">{{ link.text }}</a></li>
+                        {% endfor %}
+                        {% if content.links|length > 3 %}
+                        <li>... and {{ content.links|length - 3 }} more links</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            <h2 class="text-2xl font-semibold text-gray-700 mt-6 mb-4">Analysis</h2>
+            <p class="text-gray-600"><strong>Relevance Score:</strong> {{ '%0.2f' | format(relevance) }}</p>
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Key Information</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    <p><strong>Key Points:</strong></p>
+                    <ul class="list-disc pl-5">
+                        {% for point in key_info.key_points %}
+                        <li>{{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>Relevant Terms:</strong> {{ key_info.relevant_terms|join(', ') }}</p>
+                </div>
+            </div>
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Reliability Assessment</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    <ul class="list-disc pl-5">
+                        <li>Score: {{ reliability.reliability_score }}</li>
+                        <li>Domain Reputation: {{ reliability.domain_reputation }}</li>
+                        <li>Factors: {{ reliability.factors|join(', ') }}</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="text-gray-600 mt-4"><strong>Content Summary:</strong> {{ summary }}</p>
+            <p class="text-gray-600 mt-2"><strong>Categories:</strong> {{ categories|join(', ') }}</p>
+            <div class="collapsible mt-4">
+                <div class="collapsible-header bg-gray-200 p-3 rounded-t-lg cursor-pointer font-medium" style="display: flex; justify-content: space-between;">
+                    <span>Related News</span><span>▼</span>
+                </div>
+                <div class="collapsible-content bg-white p-3 border-t">
+                    <ul class="list-disc pl-5">
+                        {% for article in news %}
+                        <li>{{ article.title }} - {{ article.source }} (<a href="{{ article.url }}" target="_blank" class="text-blue-500 underline">Link</a>)</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
